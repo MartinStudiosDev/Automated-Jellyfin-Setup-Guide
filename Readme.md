@@ -6,7 +6,7 @@ This guide is for beginners who want:
 - Sonarr
 - Radarr
 - Prowlarr
-- SabNZB
+- Qbittorent
 - Seerr
 
 running on a PC using Debian 13 and Docker.
@@ -63,7 +63,7 @@ Find your IP address that looks like 192.168.1.XXX, make sure to write this down
 
 # Step 3 — Reserve your IP Address
 
-- On another computer type your IP address into the seacrh bar of a seacrh engine
+- On another computer type your IP address into the seacrh bar of a search engine
 - You can then log into your router with the username and password on the back of your router
 - Find the option to reserve the IP of your PC running Debian. This way it will never change
 - You can now remove the peripherals of your PC running Debian, they will no longer be needed. 
@@ -71,7 +71,7 @@ Find your IP address that looks like 192.168.1.XXX, make sure to write this down
 
 # Step 4 — SSH Into your PC
 
--On another PC, go to your CMD or terminal and type:
+- On another PC, go to your CMD or terminal and type:
  ```bash
 ssh username@192.168.1.xxx
 ```
@@ -102,6 +102,122 @@ You will then be prompted to enter your password. From here you can completely c
    ```bash
   docker ps
   ```
-# Step 5 — Stick around for daily additions!
+# Step 5 — Create Media Folders
 
-This guide will be updated daily alongside my TikTok tutorial series! 
+Now that Docker is installed, we need to create folders for:
+- Movies
+- TV shows
+- Downloads
+- Docker app data
+
+Run:
+
+```bash
+sudo mkdir -p /media/movies
+sudo mkdir -p /media/tv
+sudo mkdir -p /media/downloads
+sudo mkdir -p /srv/docker
+```
+
+---
+
+# Step 6 — Create a Docker Stack Folder
+
+```bash
+mkdir ~/media-stack
+cd ~/media-stack
+```
+
+---
+
+# Step 7 — Create a YAML File
+
+- Run:
+
+```bash
+nano docker-compose.yml
+```
+- Replace the contents of the file with this code
+  
+```bash
+- services:
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    ports:
+      - "8989:8989"
+    volumes:
+      - /srv/docker/sonarr:/config
+      - /media/tv:/tv
+      - /media/downloads:/downloads
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    ports:
+      - "7878:7878"
+    volumes:
+      - /srv/docker/radarr:/config
+      - /media/movies:/movies
+      - /media/downloads:/downloads
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    ports:
+      - "9696:9696"
+    volumes:
+      - /srv/docker/prowlarr:/config
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    ports:
+      - "8080:8080"
+    volumes:
+      - /srv/docker/qbittorrent:/config
+      - /media/downloads:/downloads
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    ports:
+      - "5055:5055"
+    volumes:
+      - /srv/docker/jellyseerr:/app/config
+    restart: unless-stopped
+```
+
+- Save the file by pressing "Ctrl + X" then "Y" followed by "Enter"
+
+---
+
+# Step 8 — Start your stack and open the services!
+
+- Run:
+
+```bash
+docker compose up -d
+```
+
+- Your services should install, give it a few minutes for the first time.
+
+- Visit your services in a browser using these links:
+  
+```bash
+# Sonarr
+http://yourIP:8989
+# Radarr
+http://yourIP:7878
+# Prowlarr
+http://yourIP:9696
+# Qbittorent
+http://yourIP:8080
+# Jellyseer
+http://yourIP:5055
+```
