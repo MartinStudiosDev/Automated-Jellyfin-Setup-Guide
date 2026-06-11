@@ -140,7 +140,7 @@ nano docker-compose.yml
 - Replace the contents of the file with this code
   
 ```bash
-- services:
+services:
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
